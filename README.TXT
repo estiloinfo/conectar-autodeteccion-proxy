@@ -1,65 +1,95 @@
-
-1. Editar el archivo de configuración del servidor DHCP
-
-	a) Agregar como parametro general la siguiente linea
-
-	option wpad-url code 252 = text;
-
-	b) Agregar a la subred el archivo que se utilizara para pasarle los datos al navegador
-	para que pueda autodetectar el proxy
-
-	subnet 172.16.0.0 netmask 255.255.0.0 {
-	.
-	.
-	.
-		option wpad-url = "http://172.16.0.1/wpad.dat";
-		option domain-name "miescuela.local";
-	}
-
-2. Reiniciar el servidor DHCP
-
-	/etc/init.d/.......       restart
+#Versión 0.1 - Solo Debian -  
 
 
-3. Copiar el archivo  wpad.dat en /var/www
+1. Configuración del servidor DHCP
 
-	Cambiarle los permisos a www-data
+
+	a) Back up archivo de configuración
+	
+
+	#cp /etc/dhcp/dhcpd.conf /etc/dhcp/dhcp.conf.org
+	
+	
+	b) Copia de archivo de configuración modificado
+	
+	#mv dhcp.conf /etc/dhcp/dhcp.conf 
+	
+	
+	c) Permisos y dueño dhcp.conf
+	
+	#chown root:root /etc/dhcp/dhcpd.conf
+	#chmod 644 /etc/dhcp/dhcpd.conf
+	
+	
+	d) Reiniciamos el servidor DHCP
+	
+	#service isc-dhcp-server restart
+
+
+2. Archivo Wpad
+
+	a) Copiamos wpad.dat en /var/www
+	 
+	#cp wpad.dat /var/www
+	
+	
+	b) Permisos y dueño 
 
 	#chown www-data /var/www/wpad.dat
-
-	Cambiarle los permisos
 	#chmod 600 /var/www/wpad.dat
 
-4. Crear enlaces simbolicos para otros navegadores
+	
+	c) Crear enlaces simbolicos para otros navegadores
 
 	#cd /var/www/
 	#ln -s wpad.dat wpad.pac
 	#ln -s wpad.dat proxy.pac
 
-5. Copiar archivo .htaccess en /var/www
 
-	Cambiarle los permisos a .htaccess
+3. Archivo  .htaccess
 
+
+	a) Copiar archivo .htaccess en /var/www
+
+	#cp .htaccess /var/www
+		
+
+	b) Permisos y dueño
+	
 	#chown www-data /var/www/.htaccess
-
-	Cambiarle los permisos
 	#chmod 600 /var/www/.htaccess
 
-6. Modificacion de bind
-	Agregar en /var/lib/bind/miescuela.local.hosts
 
-	wpad.miescuela.local. IN CNAME servicios.miescuela.local.
+4. Configuración de BIND
 
-7. reiniciar el bind
+	a) Back up archivo de configuración
 
-	/etc/init.d/.......       restart
+	#cp /var/lib/bind/miescuela.local.hosts  /var/lib/bind/miescuela.local.hosts.org
+		
 
-8. prueba
+	b) Copia de archivo de configuración modificado
+	
+	#mv miescuela.local.hosts /var/lib/bind/miescuela.local.hosts 
+	
+	
+	c) Permisos y dueño miescuela.local.host
+	
+	#chown root:root /var/lib/bind/miescuela.local.hosts
+	#chmod 644 /var/lib/bind/miescuela.local.hosts
+	
 
+	d) Reiniciamos el servidor BIND 
+	
+	#service bind9 restart
+
+	
+	e) Probamos los cambios desde un cliente conectado a nuestra red
+	
 	ping wpad
 
 
-9 configuracion de navegadores
 
-	autodeteccion de proxy activada
+5. Configuracion en navegadores de clientes
+	
+ 	a) Activar autodetección de proxy en los navegadores de los clientes conectados a nuestra red.
 
